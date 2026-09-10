@@ -1,0 +1,22 @@
+services:
+  # 后端 API + SQLite 数据库（SQLite 为嵌入式库，数据文件经 farm-data 卷持久化，
+  # 无需独立数据库容器）
+  server:
+    build: ./agri-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - farm-data:/data
+    restart: unless-stopped
+
+  # 前端静态站点（nginx），/api 反代到 server
+  web:
+    build: ./field-ui
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  farm-data:
